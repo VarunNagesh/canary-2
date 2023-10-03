@@ -1,5 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: canary-rollout
 spec:
@@ -7,6 +7,16 @@ spec:
   selector:
     matchLabels:
       app: canary
+  strategy:
+    canary:
+      canaryService: service-canary
+      stableService: service-stable
+      trafficRouting:
+        nginx:
+          stableIngress: stable-probe
+      steps:
+      - setWeight: 50
+      - pause: {}
   template:
     metadata:
       labels:
